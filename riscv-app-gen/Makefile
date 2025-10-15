@@ -1,13 +1,22 @@
+SRC ?= bubblesort/bubblesort.c
+# funcoes que o compilador pode remover por causa do -O2
+# adicionar __attribute__((noinline, used)) antes
+# exemplo: 
+# __attribute__((noinline, used))
+# void bubbleSort(int arr[], int n) { ... }
 
-SRC ?= main.c
+# trocar gcc por clang com -target
+CC = clang -target riscv32-unknown-elf
 
-CC = riscv64-unknown-elf-gcc
-OBJDUMP = riscv64-unknown-elf-objdump
-READELF = riscv64-unknown-elf-readelf
-OBJCOPY = riscv64-unknown-elf-objcopy
+# ferramentas auxiliares sao prefixadas por 'llvm-'
+OBJDUMP = llvm-objdump
+READELF = llvm-readelf
+OBJCOPY = llvm-objcopy
 
 CFLAGS = -march=rv32im -mabi=ilp32
-GCC_LDFLAGS = -T link.ld -nostartfiles -e main -O2
+
+# adicionado -nostdlib para evitar erro do -lc -lm e -lclang_rt.builtins-riscv32
+GCC_LDFLAGS = -T link.ld -nostartfiles -nostdlib -e main -O2
 
 OBJ = $(SRC:.c=.o)
 ELF = $(SRC:.c=.elf)
