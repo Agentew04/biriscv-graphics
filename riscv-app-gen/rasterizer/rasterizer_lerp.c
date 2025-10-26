@@ -57,7 +57,7 @@ static inline vec4_u8_t lerp_vec4_u8(vec4_u8_t a, vec4_u8_t b, uint8_t t) {
     return VEC4_U8(x, y, z, w);
     #else
     asm volatile(
-        ".word 0xCAFEF0DA #lerp %0 %1 %2"
+        ".word 0xCAFECAFE #lerp %0 %1 %2"
         : "+r" (t)
         : "r" (a), "r" (b)
         : "memory"
