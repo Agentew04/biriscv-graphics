@@ -34,7 +34,7 @@
 #define SPHERE_RADIUS 80
 // Parametros da iluminacao
 #define LIGHT_DIR VEC4_I8(10, -1, 20, 0)
-#define KA 20 // ambient
+#define KA 50 // ambient
 
 /*
 Fim dos parametros de configuracao
@@ -122,6 +122,7 @@ int main(void){
                 int32_t dot = dot3(n, light_dir_norm) / 127; // produto escalar normal x luz
                 if(dot < 0) dot = 0; // clamp, nao iluminar lado contrario
                 int32_t intensity = (dot * 255) / 127; // mapear para [0,255]
+                if(intensity<KA) intensity = KA;
                 vec4_u8_t color = lerp_vec4_u8(0, SPHERE_COLOR, intensity);
                 buffer[(y+HEIGHT/2) * WIDTH + x + WIDTH/2] = color;
                 #else
