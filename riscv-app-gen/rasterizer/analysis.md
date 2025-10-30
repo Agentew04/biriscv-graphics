@@ -173,3 +173,9 @@ O custo em hardware dessa operação é:
 C1: 4x Add(8 bits)
 C2: 4x Mux(8 bits) # comparador nao precisa pois usa carryout
 ```
+
+O formato da instrução é:
+|31-25|24-20|19-15|14-12|11-7 |6-0  |
+|-----|-----|-----|-----|-----|-----|
+|funct7| rs2 | rs1 |funct3| rd  |opcode|
+|0|vetor entrda 2|vetor entrada 1|100|vetor destino|0001011|
