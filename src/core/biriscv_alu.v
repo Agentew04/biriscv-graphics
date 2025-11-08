@@ -55,6 +55,29 @@ reg [31:0]      shift_left_4_r;
 reg [31:0]      shift_left_8_r;
 
 wire [31:0]     sub_res_w = alu_a_i - alu_b_i;
+// -------------------------------------------------
+// ADDER32 
+// -------------------------------------------------
+reg [31:0] addsub_B;
+reg        addsub_Ci;
+
+wire [31:0] addsub_S;
+wire Co0, Co1, Co2, Co3;
+wire unused0;
+wire unused1;
+wire unused2;
+wire unused3;
+biriscv_adder32 u_adder32 (
+    .A     (alu_a_i),
+    .B     (addsub_B),
+    .Ci    (addsub_Ci),
+    .Cprop (1'b1),
+    .S     (addsub_S),
+    .Co0   (unused0),
+    .Co1   (unused1),
+    .Co2   (unused2),
+    .Co3   (unused3)
+);
 
 //-----------------------------------------------------------------
 // ALU
@@ -144,11 +167,15 @@ begin
        //----------------------------------------------
        `ALU_ADD : 
        begin
-            result_r      = (alu_a_i + alu_b_i);
+        addsub_B  = alu_b_i;
+        addsub_Ci = 1'b0;
+        result_r  = addsub_S;
        end
        `ALU_SUB : 
        begin
-            result_r      = sub_res_w;
+        addsub_B  = ~alu_b_i;
+        addsub_Ci = 1'b1;
+        result_r  = addsub_S;
        end
        //----------------------------------------------
        // Logical

@@ -6,7 +6,6 @@ module biriscv_adder8 (
     output       Co     // Carry-out
 );
 
-    assign {Co, S} = A + B + Ci;
-
+    assign {Co, S} = {1'b0, A} + {1'b0, B} + Ci;
     
 endmodule

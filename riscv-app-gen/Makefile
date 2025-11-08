@@ -1,4 +1,4 @@
-SRC ?= rasterizer/rasterizer_lerp.c
+SRC ?= array_sum_mul/arraysum_mul.c
 # funcoes que o compilador pode remover por causa do -O2
 # adicionar __attribute__((noinline, used)) antes
 # exemplo: 

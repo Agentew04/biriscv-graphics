@@ -1,9 +1,9 @@
 ###############################################################################
 # Variables: Program ELF
 ###############################################################################
-ELF_FILE ?= test.elf
+ELF_FILE ?= rasterizer_lerp.elf
 
-OBJCOPY ?= riscv64-unknown-elf-objcopy
+OBJCOPY ?= llvm-objcopy
 ifeq ($(shell which $(OBJCOPY)),)
   ${error $(OBJCOPY) missing from PATH}
 endif
