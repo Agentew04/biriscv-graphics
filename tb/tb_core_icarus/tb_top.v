@@ -154,4 +154,28 @@ trace_inst_1
 
 `endif
 
+
+// ---------------------------------------------------------------------
+// DUMP DA MEMÓRIA TCM (u_mem.u_ram.ram)
+// ---------------------------------------------------------------------
+
+initial begin
+    // Tempo suficiente para a CPU gerar a imagem (ajuste se precisar)
+    #200000;
+
+    $display("Dumping TCM RAM para tcm_dump.hex ...");
+
+    // Caminho hierárquico correto:
+    // tb_top
+    //   └── u_mem (tcm_mem)
+    //         └── u_ram (tcm_mem_ram)
+    //               └── ram  <-- aqui está a memória real
+
+    $writememh("tcm_dump.hex", tb_top.u_mem.u_ram.ram);
+
+    $display("Dump completo!");
+    $finish;
+end
+
+
 endmodule
