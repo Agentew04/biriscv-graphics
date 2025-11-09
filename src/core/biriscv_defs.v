@@ -40,6 +40,24 @@
 //--------------------------------------------------------------------
 // Instructions Masks
 //--------------------------------------------------------------------
+`define INST_CUSTOM_R_MASK 32'hfe00707f
+
+// #add4.sat
+`define INST_ADD4_SAT      32'h0000000b   // funct3 = 000
+`define INST_ADD4_SAT_MASK `INST_CUSTOM_R_MASK
+
+// #lerp4
+`define INST_LERP4         32'h0000100b   // funct3 = 001 → 1 << 12 = 0x1000
+`define INST_LERP4_MASK    `INST_CUSTOM_R_MASK
+
+// #blend4
+`define INST_BLEND4        32'h0000200b   // funct3 = 010 → 2 << 12 = 0x2000
+`define INST_BLEND4_MASK   `INST_CUSTOM_R_MASK
+
+// #dot4
+`define INST_DOT4          32'h0000300b   // funct3 = 011 → 3 << 12 = 0x3000
+`define INST_DOT4_MASK     `INST_CUSTOM_R_MASK
+
 // andi
 `define INST_ANDI 32'h7013
 `define INST_ANDI_MASK 32'h707f

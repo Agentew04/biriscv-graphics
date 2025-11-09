@@ -1,4 +1,6 @@
 SRC ?= array_sum_mul/arraysum_mul.c
+DIR := $(shell dirname $(SRC))
+
 # funcoes que o compilador pode remover por causa do -O2
 # adicionar __attribute__((noinline, used)) antes
 # exemplo: 
@@ -9,6 +11,7 @@ SRC ?= array_sum_mul/arraysum_mul.c
 CC = clang -target riscv32-unknown-elf -S
 AS = llvm-mc -triple=riscv32-unknown-elf -filetype=obj
 LINKER = ld.lld
+CUSTOM_ASM = python3 pre_assembler.py
 
 # ferramentas auxiliares sao prefixadas por 'llvm-'
 OBJDUMP = llvm-objdump
@@ -23,6 +26,7 @@ GCC_LDFLAGS = -T link.ld -nostdlib -e main
 OBJ = $(SRC:.c=.o)
 ELF = $(SRC:.c=.elf)
 ASM = $(SRC:.c=.s)
+ASM_C = $(SRC:.c=.sc)
 DISASM =$(SRC:.c=.disasm.s)
 BIN = $(SRC:.c=.bin)
 
@@ -35,8 +39,10 @@ info: $(ELF)
 gcc_elf: $(SRC)
 # compila .c -> .s
 	$(CC) $(CFLAGS) -o $(ASM) -S $<
+# substitui instrucoes customizadas no .s
+	 $(CUSTOM_ASM) $(ASM) $(ASM_C)
 # monta .s -> .o
-	$(AS) $(ASM) -o $(OBJ) 
+	$(AS) $(ASM_C) -o $(OBJ)
 # linka .o -> .elf
 	$(LINKER) $(GCC_LDFLAGS) $(OBJ) -o $(ELF) 
 # .elf -> .bin
@@ -47,6 +53,6 @@ gcc_elf: $(SRC)
 	$(READELF) -h $(ELF)
 
 clean:
-	rm -f *.o *.elf *.s *.bin
+	@cd $(DIR) && rm -f *.o *.elf *.s *.bin
 
 .PHONY: all clean info
