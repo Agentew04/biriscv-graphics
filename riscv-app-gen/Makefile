@@ -1,4 +1,4 @@
-SRC ?= array_sum_mul/arraysum_mul.c
+SRC ?= rasterizer/rasterizer_lerp.c
 DIR := $(shell dirname $(SRC))
 
 # funcoes que o compilador pode remover por causa do -O2
@@ -38,9 +38,9 @@ info: $(ELF)
 
 gcc_elf: $(SRC)
 # compila .c -> .s
-	$(CC) $(CFLAGS) -o $(ASM) -S $<
+	$(CC) $(CFLAGS) -o $(ASM) $<
 # substitui instrucoes customizadas no .s
-	 $(CUSTOM_ASM) $(ASM) $(ASM_C)
+	$(CUSTOM_ASM) $(ASM) $(ASM_C)
 # monta .s -> .o
 	$(AS) $(ASM_C) -o $(OBJ)
 # linka .o -> .elf

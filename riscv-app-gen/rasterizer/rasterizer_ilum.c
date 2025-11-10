@@ -20,21 +20,23 @@
         -SPHERE_COLOR: define a cor da esfera
         -SPHERE_RADIUS: define o tamanho em pixels do raio da esfera
         -LIGHT_DIR: direcao da luz, em coordenadas inteiras (x,y,z). Nao precisa ser normalizada.
-        -
+        -USE_CG_INSTRUCTIONS: habilita o uso de instrucoes customizadas para aceleracao
+          de funcoes criticas.
 */
 
-#define TEST
+//#define TEST
 #define PPM_BINARY
 #define WIDTH 256
 #define HEIGHT 256
-#define BACKGROUND_COLOR VEC4_U8(15,15,100,0)
-#define SPHERE_COLOR VEC4_U8(200,50,50,0)
+#define BACKGROUND_COLOR pack_vec4_u8(15,15,100,0)
+#define SPHERE_COLOR pack_vec4_u8(200,50,50,0)
 //#define DISPLAY_NORMALS // descomentar para mostrar as normais da esfera
 // Parametros da esfera
 #define SPHERE_RADIUS 80
 // Parametros da iluminacao
-#define LIGHT_DIR VEC4_I8(10, -1, 20, 0)
+#define LIGHT_DIR pack_vec4_u8(10, -1, 20, 0)
 #define KA 50 // ambient
+#define USE_CG_INSTRUCTIONS
 
 /*
 Fim dos parametros de configuracao
@@ -48,10 +50,10 @@ Fim dos parametros de configuracao
 #else
 typedef unsigned int uint32_t; // define <stdint.h> types
 typedef int int32_t;
-typedef char uint8_t;
+typedef unsigned char uint8_t;
 #endif
 
-#include "vec.h"
+#include "instructions.h"
 
 vec4_u8_t buffer[HEIGHT*WIDTH];
 
@@ -63,47 +65,20 @@ int32_t isqrt(int32_t n){
     return x;
 }
 
-static inline vec4_u8_t lerp_vec4_u8(vec4_u8_t a, vec4_u8_t b, uint8_t t) {
-    #ifdef TEST
-    uint8_t x = VEC4_X(a) + t * (VEC4_X(b) - VEC4_X(a)) / 255;
-    uint8_t y = VEC4_Y(a) + t * (VEC4_Y(b) - VEC4_Y(a)) / 255;
-    uint8_t z = VEC4_Z(a) + t * (VEC4_Z(b) - VEC4_Z(a)) / 255;
-    uint8_t w = VEC4_W(a) + t * (VEC4_W(b) - VEC4_W(a)) / 255;
-    return VEC4_U8(x, y, z, w);
-    #else
-    asm volatile(
-        ".word 0xCAFECAFE #lerp %0 %1 %2"
-        : "+r" (t)
-        : "r" (a), "r" (b)
-        : "memory"
-    );
-    return t;
-    #endif
-}
-
-static inline int32_t dot3(vec4_u8_t a, vec4_u8_t b) {
-    #ifdef TEST
-    return (int8_t)VEC4_X(a) * (int8_t)VEC4_X(b) + (int8_t)VEC4_Y(a) * (int8_t)VEC4_Y(b) + (int8_t)VEC4_Z(a) * (int8_t)VEC4_Z(b);
-    #else
-    int32_t result;
-    asm volatile(
-        ".word 0xCAFDCAFD #dot3 %0 %1 %2"
-        : "=r" (result)
-        : "r" (a), "r" (b)
-    );
-    return result;
-    #endif
-}
-
 int main(void){ 
     // assumimos projecao ortogonal
     // esfera centralizada na camera virtual
     vec4_i8_t light_dir_norm = LIGHT_DIR;
     // normalizar LIGHT_DIR
-    int32_t light_len2 = (int8_t)VEC4_X(LIGHT_DIR)*(int8_t)VEC4_X(LIGHT_DIR) + (int8_t)VEC4_Y(LIGHT_DIR)*(int8_t)VEC4_Y(LIGHT_DIR) + (int8_t)VEC4_Z(LIGHT_DIR)*(int8_t)VEC4_Z(LIGHT_DIR);
+    int32_t light_len2 = (int8_t)unpack_signed_x(LIGHT_DIR) * (int8_t)unpack_signed_x(LIGHT_DIR) 
+        + (int8_t)unpack_signed_y(LIGHT_DIR) * (int8_t)unpack_signed_y(LIGHT_DIR) 
+        + (int8_t)unpack_signed_z(LIGHT_DIR) * (int8_t)unpack_signed_z(LIGHT_DIR);
     int32_t light_len = isqrt(light_len2);
-    light_dir_norm = VEC4_I8(((int8_t)VEC4_X(LIGHT_DIR)*127)/light_len, ((int8_t)VEC4_Y(LIGHT_DIR)*127)/light_len, ((int8_t)VEC4_Z(LIGHT_DIR)*127)/light_len, 0);
-
+    light_dir_norm = pack_vec4_u8(
+        ((int8_t)unpack_signed_x(LIGHT_DIR)*127)/light_len, 
+        ((int8_t)unpack_signed_y(LIGHT_DIR)*127)/light_len, 
+        ((int8_t)unpack_signed_z(LIGHT_DIR)*127)/light_len, 
+        0);
 
     for(int x=-WIDTH/2;x<WIDTH/2;x++){
         for(int y=-HEIGHT/2;y<HEIGHT/2;y++){
@@ -112,11 +87,22 @@ int main(void){
                 // calcular normal da superficie
                 int32_t nz = isqrt(SPHERE_RADIUS*SPHERE_RADIUS - dist2);
                 // P = (dx, dy, nz)
-                vec4_i8_t n = VEC4_I8((int8_t)((x*127)/SPHERE_RADIUS), (int8_t)((y*127)/SPHERE_RADIUS), (int8_t)((nz*127)/SPHERE_RADIUS), 0);
-                int32_t n_len2 = (int8_t)VEC4_X(n)*(int8_t)VEC4_X(n) + (int8_t)VEC4_Y(n)*(int8_t)VEC4_Y(n) + (int8_t)VEC4_Z(n)*(int8_t)VEC4_Z(n);
+                vec4_i8_t n = pack_vec4_u8(
+                    (int8_t)((x*127)/SPHERE_RADIUS), 
+                    (int8_t)((y*127)/SPHERE_RADIUS), 
+                    (int8_t)((nz*127)/SPHERE_RADIUS), 0);
+                int8_t n_x = (int8_t)unpack_signed_x(n);
+                int8_t n_y = (int8_t)unpack_signed_y(n);
+                int8_t n_z = (int8_t)unpack_signed_z(n);
+                int32_t n_len2 = n_x*n_x   
+                    + n_y*n_y 
+                    + n_z*n_z;
                 int32_t n_len = isqrt(n_len2);
                 // normaliza
-                n = VEC4_I8(((int8_t)VEC4_X(n)*127)/n_len, ((int8_t)VEC4_Y(n)*127)/n_len, ((int8_t)VEC4_Z(n)*127)/n_len, 0);
+                n = pack_vec4_u8(
+                    (n_x*127)/n_len, 
+                    (n_y*127)/n_len, 
+                    (n_z*127)/n_len, 0);
 
                 #ifndef DISPLAY_NORMALS
                 int32_t dot = dot3(n, light_dir_norm) / 127; // produto escalar normal x luz
@@ -126,7 +112,10 @@ int main(void){
                 vec4_u8_t color = lerp_vec4_u8(0, SPHERE_COLOR, intensity);
                 buffer[(y+HEIGHT/2) * WIDTH + x + WIDTH/2] = color;
                 #else
-                n = VEC4_I8(VEC4_X(n)+127, VEC4_Y(n)+127, VEC4_Z(n)+127, 0); // normalizar para [0,255]
+                n = pack_vec4_u8(
+                    unpack_signed_x(n)+127, 
+                    unpack_signed_y(n)+127, 
+                    unpack_signed_z(n)+127, 0); // normalizar para [0,255]
                 buffer[(y+HEIGHT/2) * WIDTH + x + WIDTH/2] = n;
                 #endif
                 

@@ -70,9 +70,7 @@ O formato da instrução é:
 |31-25|24-20|19-15|14-12|11-7 |6-0  |
 |-----|-----|-----|-----|-----|-----|
 |funct7| rs2 | rs1 |funct3| rd  |opcode|
-|0|signed\|x\|y\|z\|w|vetor fonte|001|registrador destino|0001011|
-
-> **TODO:** Vale a pena usar o funct7 para isso?
+|signed\|00\|x\|y\|z\|w|0|vetor fonte|001|registrador destino|0001011|
 
 O campo rs2 contém flags sobre a instrução. O primeiro bit indica se a componente
 extraída é signed(1) ou unsigned(0). Os próximos 4 bits indicam qual componente extrair. Apenas um bit deve estar setado. Exemplo:
@@ -143,7 +141,7 @@ O formato da instrução é:
 |31-25|24-20|19-15|14-12|11-7 |6-0  |
 |-----|-----|-----|-----|-----|-----|
 |funct7| rs2 | rs1 |funct3| rd  |opcode|
-|0|valor final|valor inicial|011|vetor destino/variável paramétrica|0001011|
+|0|vetor 2|vetor 1|011|resultado|0001011|
 
 ## Adição Saturada
 

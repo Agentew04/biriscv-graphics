@@ -16,6 +16,8 @@
         - PPM_BINARY: define se o arquivo de saida sera em formato binario (P6) ou ascii (P3)
         - BACKGROUND_COLOR: cor de fundo que preenche os pixels fora do triangulo. Puramente estetico.
         - MARGIN: margem entre o triangulo e as bordas da imagem. Puramente estetico.
+        - USE_CG_INSTRUCTIONS: habilita o uso de instrucoes customizadas para aceleracao
+          de funcoes criticas.
 */
 //#define TEST
 #define WIDTH 256
@@ -23,6 +25,7 @@
 #define PPM_BINARY // comment to use ascii ppm
 #define BACKGROUND_COLOR VEC4_U8(15, 15, 100, 0)
 #define MARGIN 25
+#define USE_CG_INSTRUCTIONS
 
 /*
 Fim dos parametros de configuracao
@@ -36,7 +39,8 @@ Fim dos parametros de configuracao
 #else
 typedef unsigned int uint32_t; // define <stdint.h> types
 typedef int int32_t;
-typedef char uint8_t;
+typedef unsigned char uint8_t;
+typedef char int8_t;
 #endif
 
 #define VEC_X(v) ((v) >> 24)
@@ -48,55 +52,34 @@ typedef char uint8_t;
 
 typedef uint32_t vec4_u8_t;
 
-static inline vec4_u8_t lerp_vec4_u8(vec4_u8_t a, vec4_u8_t b, uint8_t t) {
-    #ifdef TEST
-    uint8_t x = VEC_X(a) + t * (VEC_X(b) - VEC_X(a)) / 255;
-    uint8_t y = VEC_Y(a) + t * (VEC_Y(b) - VEC_Y(a)) / 255;
-    uint8_t z = VEC_Z(a) + t * (VEC_Z(b) - VEC_Z(a)) / 255;
-    uint8_t w = VEC_W(a) + t * (VEC_W(b) - VEC_W(a)) / 255;
-    return VEC4_U8(x, y, z, w);
-    #else
-    asm volatile(
-        ".dword 0xCAFECAFE #lerp %0 %1 %2"
-        : "+r" (t)
-        : "r" (a), "r" (b)
-        : "memory"
-    );
-    return t;
-    #endif
-}
-
-// static inline int32_t dot3(vec4_u8_t a, vec4_u8_t b) {
-//     #ifdef TEST
-//     return VEC_X(a) * VEC_X(b) + VEC_Y(a) * VEC_Y(b) + VEC_Z(a) * VEC_Z(b);
-//     #else
-//     int32_t result;
-//     asm volatile(
-//         ".word 0xCAFE0002"
-//         : "=r" (result)
-//         : "r" (a), "r" (b)
-//     );
-//     return result;
-//     #endif
-// }
+#include "instructions.h"
 
 vec4_u8_t buffer[HEIGHT*WIDTH];
 
 int main(void){
-    vec4_u8_t v0 = VEC4_U8(MARGIN,255-MARGIN,0,0);
-    vec4_u8_t v2 = VEC4_U8(127,MARGIN,0,0);
-    vec4_u8_t v1 = VEC4_U8(255-MARGIN,255-MARGIN,0,0);
+    vec4_u8_t v0 = pack_vec4_u8(MARGIN,255-MARGIN,0,0);
+    vec4_u8_t v2 = pack_vec4_u8(127,MARGIN,0,0);
+    vec4_u8_t v1 = pack_vec4_u8(255-MARGIN,255-MARGIN,0,0);
 
-    vec4_u8_t c0 = VEC4_U8(255,0,0,0);
-    vec4_u8_t c1 = VEC4_U8(0,255,0,0);
-    vec4_u8_t c2 = VEC4_U8(0,0,255,0);
+    vec4_u8_t c0 = pack_vec4_u8(255,0,0,0);
+    vec4_u8_t c1 = pack_vec4_u8(0,255,0,0);
+    vec4_u8_t c2 = pack_vec4_u8(0,0,255,0);
     
-    int32_t denom = (VEC_Y(v1) - VEC_Y(v2))*(VEC_X(v0) - VEC_X(v2)) + (VEC_X(v2) - VEC_X(v1))*(VEC_Y(v0) - VEC_Y(v2));
+    int32_t denom = ((int32_t)unpack_unsigned_y(v1) - (int32_t)unpack_unsigned_y(v2))
+        * ((int32_t)unpack_unsigned_x(v0) - (int32_t)unpack_unsigned_x(v2)) 
+        + ((int32_t)unpack_unsigned_x(v2) - (int32_t)unpack_unsigned_x(v1))
+        * ((int32_t)unpack_unsigned_y(v0) - (int32_t)unpack_unsigned_y(v2));
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
             // coordenadas baricentricas, xyz sao em termos da distancia de cada vertice do trig
-            int32_t w0 = ((VEC_Y(v1) - VEC_Y(v2))*(x - VEC_X(v2)) + (VEC_X(v2) - VEC_X(v1))*(y - VEC_Y(v2)));
-            int32_t w1 = ((VEC_Y(v2) - VEC_Y(v0))*(x - VEC_X(v2)) + (VEC_X(v0) - VEC_X(v2))*(y - VEC_Y(v2)));
+            int32_t w0 = ((int32_t)unpack_unsigned_y(v1) - (int32_t)unpack_unsigned_y(v2))
+                * (x - VEC_X(v2)) 
+                + ((int32_t)unpack_unsigned_x(v2) - (int32_t)unpack_unsigned_x(v1))
+                * (y - (int32_t)unpack_unsigned_y(v2));
+            int32_t w1 = ((int32_t)unpack_unsigned_y(v2) - (int32_t)unpack_unsigned_y(v0))
+                * (x - (int32_t)unpack_unsigned_x(v2)) 
+                + ((int32_t)unpack_unsigned_x(v0) - (int32_t)unpack_unsigned_x(v2))
+                * (y - (int32_t)unpack_unsigned_y(v2));
             int32_t w2 = denom - w0 - w1;
 
             if((denom > 0 && w0 >= 0 && w1 >= 0 && w2 >= 0)

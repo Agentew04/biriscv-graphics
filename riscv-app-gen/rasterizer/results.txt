@@ -1,0 +1,14 @@
+-O0:
+	ilum:
+		com cg instructions: 477
+		sem cg instructions: 628
+	lerp:
+		com cg instructions: 360
+		sem cg instructions: 403
+-O2:
+	ilum:
+		com cg instructions: 234
+		sem cg instructions: 165
+	lerp:
+		com cg instructions: 129
+		sem cg instructions: 118

@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
 from typing import Optional
 
+#
+# Autor: Joao Vitor Belmonte Rates
+#
+# Troca instrucoes customizadas no assembly gerado pelas suas
+# representacoes binarias equivalentes.
+#
+
+
 OPCODE_CUSTOM0 = b'0001011' # 0x0B
 REGISTERS_MAP = {
+    "0":    b'00000',
     "zero": b'00000',
     "ra":   b'00001',
     "sp":   b'00010',
@@ -39,10 +48,26 @@ REGISTERS_MAP = {
 
 # MUST CONTAIN # IN NAME
 INSTRUCTION_MAP = {
-    "#add4.sat": (b'0000000', b'000', OPCODE_CUSTOM0),  # func7, func3, opcode
-    "#lerp4": (b'0000000', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
-    "#blend4": (b'0000000', b'010', OPCODE_CUSTOM0),  # func7, func3, opcode
+    # jeito macaco de considerar a mesma instrucao, mas funciona :)
+    "#pack.xy": (b'0000001', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.xz": (b'0000010', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.xw": (b'0000011', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.yz": (b'0000110', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.yw": (b'0000111', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.zw": (b'0001011', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    #signed unpack
+    "#unpack.s.x": (b'1001000', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
+    "#unpack.s.y": (b'1000100', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
+    "#unpack.s.z": (b'1000010', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
+    "#unpack.s.w": (b'1000001', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
+    #unsigned unpack
+    "#unpack.u.x": (b'0001000', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
+    "#unpack.u.y": (b'0000100', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
+    "#unpack.u.z": (b'0000010', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
+    "#unpack.u.w": (b'0000001', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
+    "#lerp4": (b'0000000', b'010', OPCODE_CUSTOM0),  # func7, func3, opcode
     "#dot4": (b'0000000', b'011', OPCODE_CUSTOM0),  # func7, func3, opcode
+    "#add4.sat": (b'0000000', b'100', OPCODE_CUSTOM0),  # func7, func3, opcode
 }
 
 def encode_r_type(func7: int, rs2: int, rs1: int, func3: int, rd: int, opcode: int):
@@ -52,8 +77,11 @@ def encode_r_type(func7: int, rs2: int, rs1: int, func3: int, rd: int, opcode: i
 
 
 def encoder(instruction: str, rd: str, rs1: str, rs2: str) -> Optional[int]:
-    print(instruction, rd, rs1, rs2)
-    func7, func3, opcode = INSTRUCTION_MAP.get(instruction)
+    try:
+        func7, func3, opcode = INSTRUCTION_MAP.get(instruction)
+    except TypeError:
+        print("Error: Instruction not found:", instruction)
+        return None
     rs1_num = REGISTERS_MAP.get(rs1)
     rs2_num = REGISTERS_MAP.get(rs2)
     rd_num = REGISTERS_MAP.get(rd)
@@ -61,10 +89,19 @@ def encoder(instruction: str, rd: str, rs1: str, rs2: str) -> Optional[int]:
     return encode_r_type(func7, rs2_num, rs1_num, func3, rd_num, opcode)
 
 def replace(lines: list[str]) -> str:
-    instr, rd, rs1, rs2 = lines[-1].strip().split()[1:]  # Skip the #APP line
+    try:
+        instr, rd, rs1, rs2 = lines[-1].strip().split()[1:]  # Skip the #APP line
+    except ValueError:
+        print("Error: Invalid instruction format in lines:", lines, "parts:", lines[-1].strip().split())
+        return "".join(lines)
     encoded: bytes = encoder(instr, rd, rs1, rs2)
-    value = int(encoded, 2)
-    return f".word 0x{value:08x} " + f"# {instr} {rd} {rs1} {rs2}\n"
+    try:
+        value = int(encoded, 2)
+    except TypeError:
+        print("Error: Encoding failed for instruction:", instr, rd, rs1, rs2)
+        return "".join(lines)
+    print("Replacing instruction:", instr, rd, rs1, rs2, "with value:", f"0x{value:08x}")
+    return f"\t.word 0x{value:08x} " + f"# {instr} {rd} {rs1} {rs2}\n"
 
 def replace_file(input_file: str, output_file: str):
     BUFFER_OUTPUT = []
@@ -84,7 +121,9 @@ def replace_file(input_file: str, output_file: str):
                         break
                     print("Apending:", line, " to stack")
                 
+                print("Stack:" , TMP_STACK)
                 replaced_buffer = replace(TMP_STACK)
+                TMP_STACK.clear()
                 BUFFER_OUTPUT.append(replaced_buffer)
             else:
                 BUFFER_OUTPUT.append(line)
