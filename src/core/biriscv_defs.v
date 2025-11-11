@@ -40,23 +40,31 @@
 //--------------------------------------------------------------------
 // Instructions Masks
 //--------------------------------------------------------------------
-`define INST_CUSTOM_R_MASK 32'hfe00707f
-
 // #add4.sat
-`define INST_ADD4_SAT      32'h0000000b   // funct3 = 000
-`define INST_ADD4_SAT_MASK `INST_CUSTOM_R_MASK
+`define INST_ADD4_SAT      32'h0000400b
+`define INST_ADD4_SAT_MASK 32'hfe00707f // funct7+funct3+opcode
 
 // #lerp4
-`define INST_LERP4         32'h0000100b   // funct3 = 001 → 1 << 12 = 0x1000
-`define INST_LERP4_MASK    `INST_CUSTOM_R_MASK
-
-// #blend4
-`define INST_BLEND4        32'h0000200b   // funct3 = 010 → 2 << 12 = 0x2000
-`define INST_BLEND4_MASK   `INST_CUSTOM_R_MASK
+`define INST_LERP4         32'h0000200b 
+`define INST_LERP4_MASK    32'hfe00707f // funct7+funct3+opcode
 
 // #dot4
-`define INST_DOT4          32'h0000300b   // funct3 = 011 → 3 << 12 = 0x3000
-`define INST_DOT4_MASK     `INST_CUSTOM_R_MASK
+`define INST_DOT4          32'h0000300b
+`define INST_DOT4_MASK     32'hfe00707f // funct7+funct3+opcode
+
+// #pack
+`define INST_PACK          32'h0000000b
+`define INST_PACK_MASK     32'he000707f // funct7[0..3]+funct3+opcode
+
+// unpack
+`define INST_UNPACK        32'h0000100b
+`define INST_UNPACK_MASK   32'h61f0707f // funct7[1..2]+rs2+funct3+opcode
+
+`define INST_UNPACK_SIGN_MASK 32'h80000000
+`define INST_UNPACK_CHANNEL_X_MASK 32'h10000000
+`define INST_UNPACK_CHANNEL_Y_MASK 32'h08000000
+`define INST_UNPACK_CHANNEL_Z_MASK 32'h04000000
+`define INST_UNPACK_CHANNEL_W_MASK 32'h02000000
 
 // andi
 `define INST_ANDI 32'h7013

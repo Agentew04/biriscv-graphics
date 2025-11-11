@@ -39,6 +39,12 @@ module biriscv_decoder
     ,output                       div_o
     ,output                       csr_o
     ,output                       rd_valid_o
+    // TODO: computar esses sinais e
+    // usar eles do biriscv_decode.v e propagar
+    // para biriscv_alu.v(?)
+    ,output                       cg_propagate_adder_carry_o
+    ,output                       cg_is_pack_instruction_o
+    ,output                       cg_is_unpack_instruction_o
 );
 
 // Invalid instruction
@@ -101,7 +107,14 @@ wire invalid_w =    valid_i &&
                     (enable_muldiv_i && (opcode_i & `INST_DIV_MASK) == `INST_DIV)       ||
                     (enable_muldiv_i && (opcode_i & `INST_DIVU_MASK) == `INST_DIVU)     ||
                     (enable_muldiv_i && (opcode_i & `INST_REM_MASK) == `INST_REM)       ||
-                    (enable_muldiv_i && (opcode_i & `INST_REMU_MASK) == `INST_REMU));
+                    (enable_muldiv_i && (opcode_i & `INST_REMU_MASK) == `INST_REMU)
+                    // instrucoes de cg
+                    || ((opcode_i & `INST_ADD4_SAT_MASK) == `INST_ADD4_SAT)
+                    || ((opcode_i & `INST_LERP4_MASK) == `INST_LERP4)
+                    || ((opcode_i & `INST_PACK_MASK) == `INST_PACK)
+                    || ((opcode_i & `INST_UNPACK_MASK) == `INST_UNPACK)
+                    || ((opcode_i & `INST_DOT4_MASK) == `INST_DOT4)
+                    );
 
 assign invalid_o = invalid_w;
 
@@ -147,7 +160,14 @@ assign rd_valid_o = ((opcode_i & `INST_JALR_MASK) == `INST_JALR)     ||
                     ((opcode_i & `INST_CSRRC_MASK) == `INST_CSRRC)   ||
                     ((opcode_i & `INST_CSRRWI_MASK) == `INST_CSRRWI) ||
                     ((opcode_i & `INST_CSRRSI_MASK) == `INST_CSRRSI) ||
-                    ((opcode_i & `INST_CSRRCI_MASK) == `INST_CSRRCI);
+                    ((opcode_i & `INST_CSRRCI_MASK) == `INST_CSRRCI)
+                    // cg instructions
+                    || ((opcode_i & `INST_ADD4_SAT_MASK) == `INST_ADD4_SAT)
+                    || ((opcode_i & `INST_LERP4_MASK) == `INST_LERP4)
+                    || ((opcode_i & `INST_DOT4_MASK) == `INST_DOT4)
+                    || ((opcode_i & `INST_PACK_MASK) == `INST_PACK)
+                    || ((opcode_i & `INST_UNPACK_MASK) == `INST_UNPACK)
+                    ;
 
 assign exec_o =     ((opcode_i & `INST_ANDI_MASK) == `INST_ANDI)  ||
                     ((opcode_i & `INST_ADDI_MASK) == `INST_ADDI)  ||
@@ -169,7 +189,15 @@ assign exec_o =     ((opcode_i & `INST_ANDI_MASK) == `INST_ANDI)  ||
                     ((opcode_i & `INST_AND_MASK) == `INST_AND)    ||
                     ((opcode_i & `INST_SLL_MASK) == `INST_SLL)    ||
                     ((opcode_i & `INST_SRL_MASK) == `INST_SRL)    ||
-                    ((opcode_i & `INST_SRA_MASK) == `INST_SRA);
+                    ((opcode_i & `INST_SRA_MASK) == `INST_SRA)
+                    // cg instructions
+                    || ((opcode_i & `INST_ADD4_SAT_MASK) == `INST_ADD4_SAT)
+                    || ((opcode_i & `INST_LERP4_MASK) == `INST_LERP4)
+                    || ((opcode_i & `INST_DOT4_MASK) == `INST_DOT4)
+                    || ((opcode_i & `INST_PACK_MASK) == `INST_PACK)
+                    || ((opcode_i & `INST_UNPACK_MASK) == `INST_UNPACK)
+                    ;
+
 
 assign lsu_o =      ((opcode_i & `INST_LB_MASK) == `INST_LB)   ||
                     ((opcode_i & `INST_LH_MASK) == `INST_LH)   ||
