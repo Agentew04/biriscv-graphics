@@ -1,0 +1,4 @@
+*.elf
+*.vcd
+build/*.out
+build/*.bin

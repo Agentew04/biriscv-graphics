@@ -1,7 +1,7 @@
 ###############################################################################
 # Variables: Program ELF
 ###############################################################################
-ELF_FILE ?= rasterizer_lerp.elf
+ELF_FILE ?= rasterizer_ilum.elf
 
 OBJCOPY ?= llvm-objcopy
 ifeq ($(shell which $(OBJCOPY)),)
@@ -61,3 +61,4 @@ view:
 clean:
 	rm -rf $(BUILD_DIR) *.vcd
 
+.PHONY: all run clean view $(BUILD_DIR)/tcm.bin $(BUILD_DIR)/$(EXE)
