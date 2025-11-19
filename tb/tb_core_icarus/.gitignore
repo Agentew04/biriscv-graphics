@@ -2,3 +2,5 @@
 *.vcd
 build/*.out
 build/*.bin
+*.hex
+*.ppm
