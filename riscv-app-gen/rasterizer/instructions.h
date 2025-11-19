@@ -36,7 +36,7 @@ ao lado #NO_APP
 */
 
 static inline vec4_u8_t lerp_vec4_u8(vec4_u8_t a, vec4_u8_t b, uint8_t t) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_LERP)
     uint8_t x = VEC4_X(a) + t * (VEC4_X(b) - VEC4_X(a)) / 255;
     uint8_t y = VEC4_Y(a) + t * (VEC4_Y(b) - VEC4_Y(a)) / 255;
     uint8_t z = VEC4_Z(a) + t * (VEC4_Z(b) - VEC4_Z(a)) / 255;
@@ -55,7 +55,7 @@ static inline vec4_u8_t lerp_vec4_u8(vec4_u8_t a, vec4_u8_t b, uint8_t t) {
 }
 
 static inline vec4_u8_t pack_vec4_u8(uint8_t x, uint8_t y, uint8_t z, uint8_t w) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_PACK)
     return VEC4_U8(x, y, z, w);
     #else
     vec4_u8_t result;
@@ -74,7 +74,7 @@ static inline vec4_u8_t pack_vec4_u8(uint8_t x, uint8_t y, uint8_t z, uint8_t w)
 }
 
 static inline uint8_t unpack_unsigned_x(vec4_u8_t v) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (uint8_t)VEC4_X(v);
     #else
     uint8_t result;
@@ -88,7 +88,7 @@ static inline uint8_t unpack_unsigned_x(vec4_u8_t v) {
 }
 
 static inline uint8_t unpack_unsigned_y(vec4_u8_t v) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (uint8_t)VEC4_Y(v);
     #else
     uint8_t result;
@@ -102,7 +102,7 @@ static inline uint8_t unpack_unsigned_y(vec4_u8_t v) {
 }
 
 static inline uint8_t unpack_unsigned_z(vec4_u8_t v) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (uint8_t)VEC4_Z(v);
     #else
     uint8_t result;
@@ -116,7 +116,7 @@ static inline uint8_t unpack_unsigned_z(vec4_u8_t v) {
 }
 
 static inline uint8_t unpack_unsigned_w(vec4_u8_t v) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (uint8_t)VEC4_W(v);
     #else
     uint8_t result;
@@ -130,7 +130,7 @@ static inline uint8_t unpack_unsigned_w(vec4_u8_t v) {
 }
 
 static inline int8_t unpack_signed_x(vec4_u8_t v) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (int8_t)VEC4_X(v);
     #else
     int8_t result;
@@ -144,7 +144,7 @@ static inline int8_t unpack_signed_x(vec4_u8_t v) {
 }
 
 static inline int8_t unpack_signed_y(vec4_u8_t v) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (int8_t)VEC4_Y(v);
     #else
     int8_t result;
@@ -158,7 +158,7 @@ static inline int8_t unpack_signed_y(vec4_u8_t v) {
 }
 
 static inline int8_t unpack_signed_z(vec4_u8_t v) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (int8_t)VEC4_Z(v);
     #else
     int8_t result;
@@ -172,7 +172,7 @@ static inline int8_t unpack_signed_z(vec4_u8_t v) {
 }
 
 static inline int8_t unpack_signed_w(vec4_u8_t v) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (int8_t)VEC4_W(v);
     #else
     int8_t result;
@@ -186,7 +186,7 @@ static inline int8_t unpack_signed_w(vec4_u8_t v) {
 }
 
 static inline int32_t dot3(vec4_u8_t a, vec4_u8_t b) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_DOT)
     return VEC4_X(a) * VEC4_X(b) + VEC4_Y(a) * VEC4_Y(b) + VEC4_Z(a) * VEC4_Z(b);
     #else
     int32_t result;
@@ -200,7 +200,7 @@ static inline int32_t dot3(vec4_u8_t a, vec4_u8_t b) {
 }
 
 static inline vec4_u8_t add_sat_4(vec4_u8_t a, vec4_u8_t b) {
-    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+    #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_ADDSAT)
     uint8_t x = VEC4_X(a) + VEC4_X(b);
     if (x < VEC4_X(a)) x = 255;
     uint8_t y = VEC4_Y(a) + VEC4_Y(b);

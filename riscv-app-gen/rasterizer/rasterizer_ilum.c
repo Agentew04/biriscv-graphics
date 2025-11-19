@@ -37,6 +37,11 @@
 #define LIGHT_DIR pack_vec4_u8(10, -1, 20, 0)
 #define KA 50 // ambient
 #define USE_CG_INSTRUCTIONS
+#define USE_CG_UNPACK
+#define USE_CG_PACK
+#define USE_CG_LERP
+#define USE_CG_DOT
+#define USE_CG_ADDSAT
 
 /*
 Fim dos parametros de configuracao

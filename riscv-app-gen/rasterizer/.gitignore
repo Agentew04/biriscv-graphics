@@ -1,0 +1,6 @@
+*.s
+*.elf
+*.o
+*.bin
+*.disasm.s
+*.sc
