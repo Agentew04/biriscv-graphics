@@ -82,7 +82,7 @@ biriscv_adder32 u_adder32 (
 //-----------------------------------------------------------------
 // ALU
 //-----------------------------------------------------------------
-always @ (alu_op_i or alu_a_i or alu_b_i or sub_res_w)
+always @ (alu_op_i or alu_a_i or alu_b_i or sub_res_w or addsub_S)
 begin
     shift_right_fill_r = 16'b0;
     shift_right_1_r = 32'b0;
