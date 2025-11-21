@@ -67,7 +67,7 @@ wire          mem_d_error_w;
 wire [ 10:0]  mem_d_resp_tag_w;
 
 riscv_core
-u_dut
+u_tb_top
 //-----------------------------------------------------------------
 // Ports
 //-----------------------------------------------------------------
@@ -85,7 +85,7 @@ u_dut
     ,.mem_i_error_i(mem_i_error_w)
     ,.mem_i_inst_i(mem_i_inst_w)
     ,.intr_i(1'b0)
-    ,.reset_vector_i(32'h800000a0)
+    ,.reset_vector_i(32'h80000200)
     ,.cpu_id_i('b0)
 
     // Outputs
@@ -158,10 +158,11 @@ trace_inst_1
 // ---------------------------------------------------------------------
 // DUMP DA MEMÓRIA TCM (u_mem.u_ram.ram)
 // ---------------------------------------------------------------------
-
+// FINLIZA A SIMULAÇÃO APÓS UM TEMPO DETERMINADO E FAZ O DUMP DA MEMÓRIA TCM
 initial begin
     // Tempo suficiente para a CPU gerar a imagem (ajuste se precisar)
     #2000000;
+    //#2000000;
 
     $display("Dumping TCM RAM para tcm_dump.hex ...");
 
@@ -172,10 +173,34 @@ initial begin
     //               └── ram  <-- aqui está a memória real
 
     $writememh("tcm_dump.hex", tb_top.u_mem.u_ram.ram);
-
     $display("Dump completo!");
     $finish;
 end
 
+
+// FINALIZA A SIMULAÇÃO QUANDO UM ENDEREÇO ESPECÍFICO FOR ESCRITO (ex. hearch.c)
+/*localparam FINISH_ADDR = 32'hFFFF_0FFC;
+
+
+always @(posedge clk) begin
+    if (!rst) begin
+        if (mem_d_wr_w && mem_d_addr_w == FINISH_ADDR) begin
+            $display("\n=====================================");
+            $display(" Software requested simulation finish");
+            $display(" mem_d_addr = %h", mem_d_addr_w);
+            $display(" mem_d_data = %h", mem_d_data_wr_w);
+            $display("=====================================\n");
+
+            $display("Dumping TCM RAM para tcm_dump.hex ...");
+
+            $writememh("tcm_dump.hex", tb_top.u_mem.u_ram.ram);
+            $display("Dump completo!");
+
+            $finish;
+        end
+    end
+end
+
+*/
 
 endmodule
