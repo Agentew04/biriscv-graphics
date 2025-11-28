@@ -98,6 +98,12 @@ begin
         alu_input_a_r  = opcode_ra_operand_i;
         alu_input_b_r  = opcode_rb_operand_i;
     end
+    else if ((opcode_opcode_i & `INST_ADD4_SAT_MASK) == `INST_ADD4_SAT) // and
+    begin
+        alu_func_r     = `ALU_ADD_BYTES;
+        alu_input_a_r  = opcode_ra_operand_i;
+        alu_input_b_r  = opcode_rb_operand_i;
+    end
     else if ((opcode_opcode_i & `INST_AND_MASK) == `INST_AND) // and
     begin
         alu_func_r     = `ALU_AND;

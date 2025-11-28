@@ -60,9 +60,11 @@ wire [31:0]     sub_res_w = alu_a_i - alu_b_i;
 // -------------------------------------------------
 reg [31:0] addsub_B;
 reg        addsub_Ci;
+reg Carry_propagate;
 
 wire [31:0] addsub_S;
-wire Co0, Co1, Co2, Co3;
+wire Co0_feedback, Co1_feedback, Co2_feedback, Co3_feedback;
+
 wire unused0;
 wire unused1;
 wire unused2;
@@ -71,7 +73,7 @@ biriscv_adder32 u_adder32 (
     .A     (alu_a_i),
     .B     (addsub_B),
     .Ci    (addsub_Ci),
-    .Cprop (1'b1),
+    .Cprop (Carry_propagate),
     .S     (addsub_S),
     .Co0   (unused0),
     .Co1   (unused1),
@@ -170,11 +172,20 @@ begin
         addsub_B  = alu_b_i;
         addsub_Ci = 1'b0;
         result_r  = addsub_S;
+        Carry_propagate = 1'b1;
        end
        `ALU_SUB : 
        begin
         addsub_B  = ~alu_b_i;
         addsub_Ci = 1'b1;
+        Carry_propagate = 1'b1;
+        result_r  = addsub_S;
+       end
+       `ALU_ADD_BYTES :
+       begin
+        addsub_B  = alu_b_i;
+        Carry_propagate = 1'b0;
+        addsub_Ci = 1'b0;
         result_r  = addsub_S;
        end
        //----------------------------------------------
