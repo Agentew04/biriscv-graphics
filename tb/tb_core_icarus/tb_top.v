@@ -85,7 +85,7 @@ u_tb_top
     ,.mem_i_error_i(mem_i_error_w)
     ,.mem_i_inst_i(mem_i_inst_w)
     ,.intr_i(1'b0)
-    ,.reset_vector_i(32'h80000200)
+    ,.reset_vector_i(32'h80000000)
     ,.cpu_id_i('b0)
 
     // Outputs
@@ -179,7 +179,7 @@ end
 
 
 // FINALIZA A SIMULAÇÃO QUANDO UM ENDEREÇO ESPECÍFICO FOR ESCRITO (ex. hearch.c)
-/*localparam FINISH_ADDR = 32'hFFFF_0FFC;
+localparam FINISH_ADDR = 32'hFFFF_0FFC;
 
 
 always @(posedge clk) begin
@@ -200,7 +200,5 @@ always @(posedge clk) begin
         end
     end
 end
-
-*/
 
 endmodule
