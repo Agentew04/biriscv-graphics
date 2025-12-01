@@ -37,6 +37,8 @@
 `define ALU_LESS_THAN                           4'b1010
 `define ALU_LESS_THAN_SIGNED                    4'b1011
 `define ALU_ADD_BYTES                           4'b1100
+`define ALU_PACK                                4'b1101
+`define ALU_UNPACK                              4'b1110
 
 //--------------------------------------------------------------------
 // Instructions Masks

@@ -49,12 +49,12 @@ REGISTERS_MAP = {
 # MUST CONTAIN # IN NAME
 INSTRUCTION_MAP = {
     # jeito macaco de considerar a mesma instrucao, mas funciona :)
-    "#pack.xy": (b'0000001', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
-    "#pack.xz": (b'0000010', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
-    "#pack.xw": (b'0000011', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.xy": (b'0001100', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.xz": (b'0001010', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.xw": (b'0001001', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
     "#pack.yz": (b'0000110', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
-    "#pack.yw": (b'0000111', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
-    "#pack.zw": (b'0001011', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.yw": (b'0000101', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
+    "#pack.zw": (b'0000011', b'000', OPCODE_CUSTOM0), # func7, func3, opcode
     #signed unpack
     "#unpack.s.x": (b'1001000', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode
     "#unpack.s.y": (b'1000100', b'001', OPCODE_CUSTOM0),  # func7, func3, opcode

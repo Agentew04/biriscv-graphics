@@ -28,6 +28,8 @@ module biriscv_alu
      input  [  3:0]  alu_op_i
     ,input  [ 31:0]  alu_a_i
     ,input  [ 31:0]  alu_b_i
+    // eh o campo funct7, contem info das instrucoes pack e unpack
+    ,input [6:0] alu_cg_info
 
     // Outputs
     ,output [ 31:0]  alu_p_o
@@ -56,7 +58,7 @@ reg [31:0]      shift_left_8_r;
 
 wire [31:0]     sub_res_w = alu_a_i - alu_b_i;
 // -------------------------------------------------
-// ADDER32 
+// ADDER32
 // -------------------------------------------------
 reg [31:0] addsub_B;
 reg        addsub_Ci;
@@ -81,6 +83,22 @@ biriscv_adder32 u_adder32 (
     .Co3   (unused3)
 );
 
+// pack
+wire pack_comp_x;
+assign pack_comp_x = alu_cg_info[3];
+wire pack_comp_y;
+assign pack_comp_y = alu_cg_info[2];
+wire pack_comp_z;
+assign pack_comp_z = alu_cg_info[1];
+wire pack_comp_w;
+assign pack_comp_w = alu_cg_info[0];
+
+// unpack
+wire unpack_isSigned;
+assign unpack_isSigned = alu_cg_info[6];
+wire [3:0] unpack_comp;
+assign unpack_comp = alu_cg_info[3:0];
+
 //-----------------------------------------------------------------
 // ALU
 //-----------------------------------------------------------------
@@ -101,7 +119,7 @@ begin
        //----------------------------------------------
        // Shift Left
        //----------------------------------------------   
-       `ALU_SHIFTL :
+       `ALU_SHIFTL:
        begin
             if (alu_b_i[0] == 1'b1)
                 shift_left_1_r = {alu_a_i[30:0],1'b0};
@@ -163,61 +181,114 @@ begin
                 result_r = {shift_right_fill_r[31:16], shift_right_8_r[31:16]};
             else
                 result_r = shift_right_8_r;
-       end       
+       end
        //----------------------------------------------
        // Arithmetic
        //----------------------------------------------
-       `ALU_ADD : 
+       `ALU_ADD:
        begin
         addsub_B  = alu_b_i;
         addsub_Ci = 1'b0;
         result_r  = addsub_S;
         Carry_propagate = 1'b1;
        end
-       `ALU_SUB : 
+       `ALU_SUB:
        begin
         addsub_B  = ~alu_b_i;
         addsub_Ci = 1'b1;
         Carry_propagate = 1'b1;
         result_r  = addsub_S;
        end
-       `ALU_ADD_BYTES :
+       `ALU_ADD_BYTES:
        begin
         addsub_B  = alu_b_i;
         Carry_propagate = 1'b0;
         addsub_Ci = 1'b0;
         result_r  = addsub_S;
        end
+       `ALU_PACK:
+       begin
+        // TODO
+       end
        //----------------------------------------------
        // Logical
-       //----------------------------------------------       
-       `ALU_AND : 
+       //----------------------------------------------
+       `ALU_AND:
        begin
             result_r      = (alu_a_i & alu_b_i);
        end
-       `ALU_OR  : 
+       `ALU_OR:
        begin
             result_r      = (alu_a_i | alu_b_i);
        end
-       `ALU_XOR : 
+       `ALU_XOR:
        begin
             result_r      = (alu_a_i ^ alu_b_i);
        end
        //----------------------------------------------
        // Comparision
        //----------------------------------------------
-       `ALU_LESS_THAN : 
+       `ALU_LESS_THAN:
        begin
             result_r      = (alu_a_i < alu_b_i) ? 32'h1 : 32'h0;
        end
-       `ALU_LESS_THAN_SIGNED : 
+       `ALU_LESS_THAN_SIGNED:
        begin
             if (alu_a_i[31] != alu_b_i[31])
                 result_r  = alu_a_i[31] ? 32'h1 : 32'h0;
             else
-                result_r  = sub_res_w[31] ? 32'h1 : 32'h0;            
-       end       
-       default  : 
+                result_r  = sub_res_w[31] ? 32'h1 : 32'h0;
+       end
+       `ALU_PACK:
+       begin
+            // pack eh soh fio.
+            result_r = {
+                (pack_comp_x == 1'b1 ? alu_a_i[7:0] : 8'b0), // X
+                (pack_comp_y == 1'b1 ?
+                    (pack_comp_x == 1'b1 ? alu_b_i[7:0] : alu_a_i[7:0])
+                    : 8'b0), // Y, RS2 se X senao RS1
+                (pack_comp_z == 1'b1 ?
+                    (pack_comp_w == 1'b1 ? alu_a_i[7:0] : alu_b_i[7:0])
+                    : 8'b0), // Z, RS1 se W, senao RS2
+                (pack_comp_w == 1'b1 ? alu_b_i[7:0] : 8'b0)  // W
+            };
+       end
+       `ALU_UNPACK:
+       begin
+            // unpack, so fio (acho. isso sepa vira um mux)
+            case(unpack_comp)
+            4'b1000: // X
+            begin
+                result_r = {
+                    ((unpack_isSigned && alu_a_i[31]) ? {24{1'b1}} : 24'b0), // sign
+                    alu_a_i[31:24] // componente
+                };
+            end
+            4'b0100: // Y
+            begin
+                result_r = {
+                    (unpack_isSigned && alu_a_i[23]) ? {24{1'b1}} : 24'b0, // sign
+                    alu_a_i[23:16] // componente
+                };
+            end
+            4'b0010: // Z
+            begin
+                result_r = {
+                    (unpack_isSigned && alu_a_i[15]) ? {24{1'b1}} : 24'b0, // sign
+                    alu_a_i[15:8] // componente
+                };
+            end
+            4'b0001: // W
+            begin
+                result_r = {
+                    (unpack_isSigned && alu_a_i[7]) ? {24{1'b1}} : 24'b0, // sign
+                    alu_a_i[7:0] // componente
+                };
+            end
+            endcase
+
+       end
+       default:
        begin
             result_r      = alu_a_i;
        end

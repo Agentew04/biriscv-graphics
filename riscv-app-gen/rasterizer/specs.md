@@ -2,7 +2,7 @@
 
 Os vetores são tightly packed em um único registrador de 32 bits.
 
-| bit 0-7      | bit 8-15     | bit 16-23    | bit 24-31    |
+| bit 31-24    | bit 23-16    | bit 15-8     | bit 7-0      |
 |--------------|--------------|--------------|--------------|
 | Componente X | Componente Y | Componente Z | Componente W |
 
@@ -45,7 +45,7 @@ O formato da instrução é:
 |31-25|24-20|19-15|14-12|11-7 |6-0  |
 |-----|-----|-----|-----|-----|-----|
 |funct7| rs2 | rs1 |funct3| rd  |opcode|
-|000\|comp1\|comp2 |componente 2|componente 1|000|vetor destino|0001011|
+|000\|x\|y\|z\|w |componente 2|componente 1|000|vetor destino|0001011|
 
 Os valores `comp1` e `comp2` são de 2 bits e indicam qual componente está sendo carregada no rs1 e rs2. Exemplo:
 ```

@@ -169,6 +169,8 @@ begin
             ((opcode_i & `INST_REMU_MASK) == `INST_REMU)   : dbg_inst_str = "remu";
             ((opcode_i & `INST_IFENCE_MASK) == `INST_IFENCE)  : dbg_inst_str = "fence.i";
             ((opcode_i & `INST_ADD4_SAT_MASK) == `INST_ADD4_SAT)   : dbg_inst_str = "add4.sat";
+            ((opcode_i & `INST_PACK_MASK) == `INST_PACK)    : dbg_inst_str = "pack";
+            ((opcode_i & `INST_UNPACK_MASK) == `INST_UNPACK)    : dbg_inst_str = "unpack";
         endcase
 
         case (1'b1)

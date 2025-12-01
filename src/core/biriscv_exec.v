@@ -85,6 +85,7 @@ end
 reg [3:0]  alu_func_r;
 reg [31:0] alu_input_a_r;
 reg [31:0] alu_input_b_r;
+reg [6:0] alu_cg_info_r;
 
 always @ *
 begin
@@ -221,12 +222,27 @@ begin
         alu_func_r     = `ALU_ADD;
         alu_input_a_r  = opcode_pc_i;
         alu_input_b_r  = imm20_r;
-    end     
-    else if (((opcode_opcode_i & `INST_JAL_MASK) == `INST_JAL) || ((opcode_opcode_i & `INST_JALR_MASK) == `INST_JALR)) // jal, jalr
+    end
+    else if (((opcode_opcode_i & `INST_JAL_MASK) == `INST_JAL)
+        || ((opcode_opcode_i & `INST_JALR_MASK) == `INST_JALR)) // jal, jalr
     begin
         alu_func_r     = `ALU_ADD;
         alu_input_a_r  = opcode_pc_i;
         alu_input_b_r  = 32'd4;
+    end
+    else if ((opcode_opcode_i & `INST_PACK_MASK) == `INST_PACK) // pack
+    begin
+        alu_func_r = `ALU_PACK;
+        alu_input_a_r  = opcode_ra_operand_i;
+        alu_input_b_r  = opcode_rb_operand_i;
+        alu_cg_info_r = opcode_opcode_i[31:25];
+    end
+    else if ((opcode_opcode_i & `INST_UNPACK_MASK) == `INST_UNPACK) // unpack
+    begin
+        alu_func_r = `ALU_UNPACK;
+        alu_input_a_r  = opcode_ra_operand_i;
+        alu_input_b_r  = opcode_rb_operand_i;
+        alu_cg_info_r = opcode_opcode_i[31:25];
     end
 end
 
@@ -241,6 +257,7 @@ u_alu
     .alu_op_i(alu_func_r),
     .alu_a_i(alu_input_a_r),
     .alu_b_i(alu_input_b_r),
+    .alu_cg_info(alu_cg_info_r),
     .alu_p_o(alu_p_w)
 );
 
@@ -248,11 +265,12 @@ u_alu
 // Flop ALU output
 //-------------------------------------------------------------
 reg [31:0] result_q;
+
 always @ (posedge clk_i or posedge rst_i)
 if (rst_i)
     result_q  <= 32'b0;
 else if (~hold_i)
-    result_q <= alu_p_w;
+    result_q <= result_q;
 
 assign writeback_value_o  = result_q;
 
@@ -338,7 +356,7 @@ begin
     end
     else if ((opcode_opcode_i & `INST_BNE_MASK) == `INST_BNE) // bne
     begin
-        branch_r      = 1'b1;    
+        branch_r      = 1'b1;
         branch_taken_r= (opcode_ra_operand_i != opcode_rb_operand_i);
     end
     else if ((opcode_opcode_i & `INST_BLT_MASK) == `INST_BLT) // blt

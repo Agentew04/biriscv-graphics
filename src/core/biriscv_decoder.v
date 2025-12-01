@@ -42,9 +42,9 @@ module biriscv_decoder
     // TODO: computar esses sinais e
     // usar eles do biriscv_decode.v e propagar
     // para biriscv_alu.v(?)
-    ,output                       cg_propagate_adder_carry_o
-    ,output                       cg_is_pack_instruction_o
-    ,output                       cg_is_unpack_instruction_o
+    // ,output                       cg_propagate_adder_carry_o
+    // ,output                       cg_is_pack_instruction_o
+    // ,output                       cg_is_unpack_instruction_o
 );
 
 // Invalid instruction
