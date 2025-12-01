@@ -168,6 +168,7 @@ begin
             ((opcode_i & `INST_REM_MASK) == `INST_REM)    : dbg_inst_str = "rem";
             ((opcode_i & `INST_REMU_MASK) == `INST_REMU)   : dbg_inst_str = "remu";
             ((opcode_i & `INST_IFENCE_MASK) == `INST_IFENCE)  : dbg_inst_str = "fence.i";
+            ((opcode_i & `INST_ADD4_SAT_MASK) == `INST_ADD4_SAT)   : dbg_inst_str = "add4.sat";
         endcase
 
         case (1'b1)
