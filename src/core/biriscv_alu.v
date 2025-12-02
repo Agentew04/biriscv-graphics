@@ -206,10 +206,11 @@ begin
         addsub_Ci = 1'b0;
         result_r  = addsub_S;
        end
-       `ALU_PACK:
+/*       `ALU_PACK:
        begin
         // TODO
        end
+       */
        //----------------------------------------------
        // Logical
        //----------------------------------------------

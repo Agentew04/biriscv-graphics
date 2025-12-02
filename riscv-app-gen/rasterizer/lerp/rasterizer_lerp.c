@@ -23,10 +23,11 @@
 #define WIDTH 256
 #define HEIGHT 256
 #define PPM_BINARY // comment to use ascii ppm
-#define BACKGROUND_COLOR VEC4_U8(15, 15, 100, 0)
+#define BACKGROUND_COLOR 0x0E0E6400  //VEC4_U8(15, 15, 100, 0)
 #define MARGIN 25
 #define USE_CG_INSTRUCTIONS
-
+#define USE_CG_PACK
+#define USE_CG_UNPACK
 /*
 Fim dos parametros de configuracao
 */
@@ -52,7 +53,7 @@ typedef char int8_t;
 
 typedef uint32_t vec4_u8_t;
 
-#include "instructions.h"
+#include "../instructions.h"
 
 vec4_u8_t buffer[HEIGHT*WIDTH];
 

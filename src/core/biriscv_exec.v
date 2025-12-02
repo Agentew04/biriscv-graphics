@@ -270,7 +270,7 @@ always @ (posedge clk_i or posedge rst_i)
 if (rst_i)
     result_q  <= 32'b0;
 else if (~hold_i)
-    result_q <= result_q;
+    result_q <= alu_p_w;
 
 assign writeback_value_o  = result_q;
 

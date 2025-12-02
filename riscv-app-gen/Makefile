@@ -18,7 +18,7 @@ OBJDUMP = llvm-objdump
 READELF = llvm-readelf
 OBJCOPY = llvm-objcopy
 
-CFLAGS = -march=rv32im -mabi=ilp32 -O2
+CFLAGS = -march=rv32im -mabi=ilp32 -O0
 
 # adicionado -nostdlib para evitar erro do -lc -lm e -lclang_rt.builtins-riscv32
 GCC_LDFLAGS = -T link.ld -nostdlib -e main

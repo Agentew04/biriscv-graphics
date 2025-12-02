@@ -57,7 +57,7 @@ static inline vec4_u8_t lerp_vec4_u8(vec4_u8_t a, vec4_u8_t b, uint8_t t) {
     #endif
 }
 
-static inline vec4_u8_t pack_vec4_u8(uint8_t x, uint8_t y, uint8_t z, uint8_t w) {
+static inline vec4_u8_t pack_vec4_u8(uint32_t x, uint32_t y, uint32_t z, uint32_t w) {
     #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_PACK)
     return VEC4_U8(x, y, z, w);
     #else
@@ -82,12 +82,12 @@ static inline vec4_u8_t pack_vec4_u8(uint8_t x, uint8_t y, uint8_t z, uint8_t w)
     #endif
 }
 
-static inline uint8_t unpack_unsigned_x(vec4_u8_t v) {
+static inline __attribute__((always_inline)) uint32_t unpack_unsigned_x(vec4_u8_t v) {
     #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (uint8_t)VEC4_X(v);
     #else
-    uint8_t result;
-    asm volatile(
+    uint32_t result;
+    asm (
         ".word 0x0 #unpack.u.x %0 %1 0"
         : "=r" (result)
         : "r" (v)
@@ -96,12 +96,12 @@ static inline uint8_t unpack_unsigned_x(vec4_u8_t v) {
     #endif
 }
 
-static inline uint8_t unpack_unsigned_y(vec4_u8_t v) {
+static inline __attribute__((always_inline))  uint32_t unpack_unsigned_y(vec4_u8_t v) {
     #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (uint8_t)VEC4_Y(v);
     #else
-    uint8_t result;
-    asm volatile(
+    uint32_t result;
+    asm (
         ".word 0x0 #unpack.u.y %0 %1 0"
         : "=r" (result)
         : "r" (v)
@@ -110,12 +110,12 @@ static inline uint8_t unpack_unsigned_y(vec4_u8_t v) {
     #endif
 }
 
-static inline uint8_t unpack_unsigned_z(vec4_u8_t v) {
+static inline __attribute__((always_inline)) uint32_t unpack_unsigned_z(vec4_u8_t v) {
     #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (uint8_t)VEC4_Z(v);
     #else
-    uint8_t result;
-    asm volatile(
+    uint32_t result;
+    asm (
         ".word 0x0 #unpack.u.z %0 %1 0"
         : "=r" (result)
         : "r" (v)
@@ -124,12 +124,12 @@ static inline uint8_t unpack_unsigned_z(vec4_u8_t v) {
     #endif
 }
 
-static inline uint8_t unpack_unsigned_w(vec4_u8_t v) {
+static inline __attribute__((always_inline)) uint32_t unpack_unsigned_w(vec4_u8_t v) {
     #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS) || !defined(USE_CG_UNPACK)
     return (uint8_t)VEC4_W(v);
     #else
-    uint8_t result;
-    asm volatile(
+    uint32_t result;
+    asm (
         ".word 0x0 #unpack.u.w %0 %1 0"
         : "=r" (result)
         : "r" (v)

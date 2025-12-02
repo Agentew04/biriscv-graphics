@@ -33,7 +33,7 @@ module riscv_core
     ,parameter SUPPORT_SUPER    = 0
     ,parameter SUPPORT_MMU      = 0
     ,parameter SUPPORT_DUAL_ISSUE = 1
-    ,parameter SUPPORT_LOAD_BYPASS = 1
+    ,parameter SUPPORT_LOAD_BYPASS = 0
     ,parameter SUPPORT_MUL_BYPASS = 1
     ,parameter SUPPORT_REGFILE_XILINX = 0
     ,parameter EXTRA_DECODE_STAGE = 0
