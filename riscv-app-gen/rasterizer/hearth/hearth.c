@@ -1,5 +1,7 @@
 /*
     Programa: Desenha um coração grande (64x64), sem ponto flutuante.
+    Autor: João Vitor Belmonte Rates
+    Data: 21/11/2025
 */
 
 #define TEST

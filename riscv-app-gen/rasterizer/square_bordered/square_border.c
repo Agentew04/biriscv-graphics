@@ -1,5 +1,6 @@
 /*
     Programa: Prenche um array como um quadrado vermelho de bordas azuis. Finalidade de teste
+    Autor: João Vitor Belmonte Rates
     Data: 21/11/2025
     Descricao: Prenche um array como um quadrado vermelho de bordas azuis. Finalidade de teste
 */

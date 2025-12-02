@@ -104,6 +104,7 @@ begin
     dbg_inst_rd  = "-";
     dbg_inst_pc  = 32'bx;
 
+    // se a palavra vinda da memoria eh um dado valido
     if (valid_i)
     begin
         dbg_inst_pc  = pc_i;
@@ -255,7 +256,7 @@ begin
                 dbg_inst_rd  = "-";
                 dbg_inst_imm = `DBG_IMM_STOREIMM;
             end
-        endcase        
+        endcase
     end
 end
 `endif

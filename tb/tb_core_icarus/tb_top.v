@@ -85,7 +85,7 @@ u_tb_top
     ,.mem_i_error_i(mem_i_error_w)
     ,.mem_i_inst_i(mem_i_inst_w)
     ,.intr_i(1'b0)
-    ,.reset_vector_i(32'h80000000)
+    ,.reset_vector_i(32'h80000038)
     ,.cpu_id_i('b0)
 
     // Outputs
@@ -161,7 +161,7 @@ trace_inst_1
 // FINLIZA A SIMULAÇÃO APÓS UM TEMPO DETERMINADO E FAZ O DUMP DA MEMÓRIA TCM
 initial begin
     // Tempo suficiente para a CPU gerar a imagem (ajuste se precisar)
-    #2000000;
+    #20000;
     //#2000000;
 
     $display("Dumping TCM RAM para tcm_dump.hex ...");

@@ -30,8 +30,10 @@ Exemplo teórico:
 ```
 t0 # vetor
 t1 -> t4 # componentes
+t5 # temporario
 pack.xy t0, t1, t2 # carrega x e y
-pack.zw t0, t3, t4 # carrega z e w
+pack.zw t5, t3, t4 # carrega z e w
+or t0, t0, t5      # junta duas metades
 ```
 ou até carregar em duas operações 3 componentes
 ```

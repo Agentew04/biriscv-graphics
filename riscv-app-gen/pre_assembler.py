@@ -71,7 +71,7 @@ INSTRUCTION_MAP = {
 }
 
 def encode_r_type(func7: int, rs2: int, rs1: int, func3: int, rd: int, opcode: int):
-    instruction = func7 + rs2 + rs1 + func3 + rd + opcode
+    instruction = (func7 << 25) | (rs2 << 20) | (rs1 << 15) | func3 | rd | opcode
     return instruction
 
 

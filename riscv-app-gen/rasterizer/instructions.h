@@ -1,7 +1,7 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-#if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
+// #if defined(TEST) || !defined(USE_CG_INSTRUCTIONS)
 #define VEC4_X(v) ((v) >> 24)
 #define VEC4_Y(v) (((v) >> 16) & 0xFF)
 #define VEC4_Z(v) (((v) >> 8) & 0xFF)
@@ -9,7 +9,7 @@
 // signed components has masking because two complement overflows 1's into higher bits
 #define VEC4_I8(x, y, z, w) (((x & 0xFF) << 24) | ((y & 0xFF) << 16) | ((z & 0xFF) << 8) | (w & 0xFF))
 #define VEC4_U8(x, y, z, w) (((x) << 24) | ((y) << 16) | ((z) << 8) | (w))
-#endif
+// #endif
 
 #ifndef uint32_t
 typedef unsigned int uint32_t; // define <stdint.h> types
@@ -23,6 +23,9 @@ typedef uint32_t vec4_u8_t;
 typedef uint32_t vec4_i8_t;
 #endif
 
+static inline void stop_sim(void){
+    *(volatile uint32_t*)0xFFFF0FFC = 0x12345678;
+}
 
 /*
 Autor: Rodrigo Appelt
@@ -59,15 +62,21 @@ static inline vec4_u8_t pack_vec4_u8(uint8_t x, uint8_t y, uint8_t z, uint8_t w)
     return VEC4_U8(x, y, z, w);
     #else
     vec4_u8_t result;
+    vec4_u8_t result_temp;
     asm volatile(
         ".word 0x0 #pack.xy %0 %1 %2"
         : "=r" (result)
         : "r" (x), "r" (y)
     );
     asm volatile(
-        ".word 0x0 #pack.zw %0 %2 %3"
+        ".word 0x0 #pack.zw %0 %1 %2"
+        : "=r" (result_temp)
+        : "r" (z), "r" (w)
+    );
+    asm volatile(
+        "or %0, %1, %2"
         : "=r" (result)
-        : "r" (result), "r" (z), "r" (w)
+        : "r" (result), "r" (result_temp)
     );
     return result;
     #endif

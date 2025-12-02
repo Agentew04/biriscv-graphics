@@ -1,9 +1,9 @@
 /*
     Programa: Rasterizador com iluminacao por pixel
+    Autor: João Vitor Belmonte Rates
     Data: 09/11/2025
-    Descricao: Programa simples que renderiza uma cena com uma esfera iluminada
-        por uma luz direcional. Utiliza iluminacao por pixel e o modelo
-        de iluminacao PHONG simplificado(sem iluminacao especular).
+    Descricao: Testa a instrução de adição de vetores compactos
+        com saturação de valores.
 */
 
 //#define TEST

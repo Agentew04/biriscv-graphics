@@ -1,7 +1,7 @@
 ###############################################################################
 # Variables: Program ELF
 ###############################################################################
-ELF_FILE ?= rasterizer_ilum.elf
+ELF_FILE ?= pack.elf
 
 OBJCOPY ?= llvm-objcopy
 ifeq ($(shell which $(OBJCOPY)),)
